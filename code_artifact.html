@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一年级华文生字词语填充大冒险 - 马里奥特别版</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #5c94fc;
+            background-image: 
+                linear-gradient(to bottom, #5c94fc 0%, #80bfff 70%, #d0e7ff 100%);
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .kuaile-font {
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+
+        /* Mario Pixel Borders & Shadows */
+        .mario-card {
+            background-color: #f8f8f8;
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0px #000, inset -4px -4px 0px #ccc;
+        }
+
+        .mario-btn-yellow {
+            background-color: #f8d820;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #000, inset -3px -3px 0px #b89800, inset 3px 3px 0px #fff880;
+            transition: all 0.1s ease;
+        }
+
+        .mario-btn-yellow:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background-color: #ffe040;
+            box-shadow: 6px 6px 0px #000, inset -3px -3px 0px #b89800, inset 3px 3px 0px #fff880;
+        }
+
+        .mario-btn-yellow:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .mario-btn-blue {
+            background-color: #00a8f8;
+            border: 4px solid #000;
+            color: white;
+            box-shadow: 4px 4px 0px #000, inset -3px -3px 0px #0058b8, inset 3px 3px 0px #80d8ff;
+        }
+
+        .mario-brick {
+            background: #b84418;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.3) 2px, transparent 2px),
+                linear-gradient(180deg, rgba(0,0,0,0.3) 2px, transparent 2px);
+            background-size: 20px 10px;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            color: #fff;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .mario-question-block {
+            background-color: #f8a000;
+            background-image: radial-gradient(#fc3000 15%, transparent 16%);
+            background-size: 16px 16px;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #000, inset -3px -3px 0px #a04000, inset 3px 3px 0px #fce000;
+            color: #fff;
+        }
+
+        .mario-pipe {
+            background: linear-gradient(90deg, #00a800 0%, #00f800 25%, #00a800 60%, #005000 100%);
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        /* Animations */
+        @keyframes jump {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+            100% { transform: translateY(0); }
+        }
+
+        .animate-mario-jump {
+            animation: jump 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes floatCoin {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(1.3); }
+        }
+
+        .floating-coin {
+            position: absolute;
+            animation: floatCoin 0.8s forwards ease-out;
+            pointer-events: none;
+            color: #f8d820;
+            font-weight: bold;
+            font-size: 1.5rem;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        /* Ground Decorative Grass */
+        .mario-ground {
+            background: #e45c10;
+            background-image: linear-gradient(0deg, #e45c10 80%, #00a800 80%);
+            border-top: 4px solid #000;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between overflow-x-hidden">
+
+    <!-- Top HUD Bar -->
+    <header class="bg-black/80 text-white p-3 border-b-4 border-yellow-400 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex flex-wrap justify-between items-center gap-2 px-2">
+            <!-- Mario Score & World -->
+            <div class="flex items-center space-x-4 pixel-font text-xs sm:text-sm">
+                <div>
+                    <span class="text-red-500">MARIO</span><br>
+                    <span id="score-display" class="text-yellow-300">000000</span>
+                </div>
+                <div>
+                    <span class="text-yellow-400">COINS</span><br>
+                    <span id="coins-display" class="text-white">🪙 x0</span>
+                </div>
+                <div>
+                    <span class="text-green-400">WORLD</span><br>
+                    <span id="world-display" class="text-white">1-1</span>
+                </div>
+            </div>
+
+            <!-- Lives & Sound Control -->
+            <div class="flex items-center space-x-3">
+                <div id="lives-display" class="flex text-xl tracking-widest">
+                    ❤️ ❤️ ❤️
+                </div>
+                <button id="pinyin-toggle" onclick="togglePinyin()" class="mario-btn-blue text-xs px-2 py-1 rounded font-bold hover:bg-blue-400">
+                    拼音: <span id="pinyin-status">关</span>
+                </button>
+                <button id="sound-toggle" onclick="toggleSound()" class="bg-gray-700 hover:bg-gray-600 border-2 border-white text-white p-1 rounded text-xs">
+                    🔊 音效
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl w-full mx-auto p-3 sm:p-5 flex-grow flex flex-col justify-center">
+
+        <!-- START SCREEN -->
+        <div id="start-screen" class="mario-card p-6 text-center space-y-6 my-auto">
+            <div class="inline-block bg-red-600 text-white px-6 py-2 rounded-full border-4 border-black text-sm sm:text-base font-bold tracking-wider animate-bounce">
+                ★ 2026 一年级华文听写表 (单元1 - 22) ★
+            </div>
+            <h1 class="kuaile-font text-4xl sm:text-5xl text-red-600 drop-shadow-[0_4px_0_#000] tracking-wide">
+                马里奥生字词语填充大冒险
+            </h1>
+            <p class="text-gray-700 font-bold text-base sm:text-lg">
+                帮助马里奥回答 50 道华文句子填空题，摘取关卡城堡金币吧！
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto my-4 text-sm font-bold">
+                <div class="mario-question-block p-3 rounded text-center">
+                    <div class="text-2xl mb-1">🪙 50 题挑战</div>
+                    <div class="text-xs text-yellow-100">覆盖全册22个单元生字</div>
+                </div>
+                <div class="mario-question-block p-3 rounded text-center">
+                    <div class="text-2xl mb-1">🍄 道具协助</div>
+                    <div class="text-xs text-yellow-100">消除错项、双倍金币</div>
+                </div>
+                <div class="mario-question-block p-3 rounded text-center">
+                    <div class="text-2xl mb-1">🏰 城堡通关</div>
+                    <div class="text-xs text-yellow-100">积攒最高分夺得奖杯</div>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button onclick="startGame()" class="mario-btn-yellow text-2xl sm:text-3xl kuaile-font px-10 py-4 rounded-xl text-black font-extrabold hover:scale-105 transition-transform">
+                    🚀 开始冒险 START 🎮
+                </button>
+            </div>
+        </div>
+
+        <!-- GAME PLAY AREA -->
+        <div id="game-screen" class="hidden flex-col space-y-4">
+
+            <!-- Progress Bar / Mario Map -->
+            <div class="mario-card p-3 rounded-lg relative overflow-hidden bg-sky-200">
+                <div class="flex justify-between items-center text-xs font-bold text-gray-700 mb-1">
+                    <span>🏁 起点 (单元1)</span>
+                    <span id="progress-text" class="pixel-font text-red-600">Q 1 / 50</span>
+                    <span>🏰 终点城堡 (单元22)</span>
+                </div>
+                <!-- Track Bar -->
+                <div class="w-full bg-gray-300 h-4 rounded-full border-2 border-black relative overflow-hidden">
+                    <div id="progress-fill" class="bg-green-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <!-- Running Mario Icon -->
+                <div id="mario-avatar" class="absolute top-1 text-2xl transition-all duration-300" style="left: 0%;">
+                    🏃‍♂️
+                </div>
+            </div>
+
+            <!-- Question Box -->
+            <div id="question-card" class="mario-card p-5 sm:p-8 rounded-xl bg-white relative">
+                <!-- Unit Tag -->
+                <div class="flex justify-between items-center mb-4">
+                    <span id="unit-badge" class="bg-red-500 text-white text-xs sm:text-sm px-3 py-1 rounded-full font-bold border-2 border-black">
+                        【第一单元】
+                    </span>
+                    <span id="pinyin-hint" class="hidden text-sm text-blue-600 font-medium">
+                        拼音提示已开启
+                    </span>
+                </div>
+
+                <!-- Sentence Display -->
+                <div class="my-6 text-center">
+                    <p id="sentence-display" class="text-xl sm:text-2xl font-bold leading-relaxed text-gray-800">
+                        加载中...
+                    </p>
+                    <p id="sentence-pinyin" class="hidden text-sm sm:text-base text-blue-600 font-semibold mt-2">
+                    </p>
+                </div>
+
+                <!-- Powerups Bar -->
+                <div class="flex justify-center items-center space-x-3 pt-2 border-t-2 border-gray-200">
+                    <span class="text-xs font-bold text-gray-500">道具工具箱:</span>
+                    <button id="powerup-mushroom" onclick="useMushroom()" class="bg-red-100 border-2 border-red-500 hover:bg-red-200 px-3 py-1 rounded-lg text-xs font-bold flex items-center space-x-1">
+                        <span>🍄 50/50</span>
+                        <span id="count-mushroom" class="bg-red-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">3</span>
+                    </button>
+                    <button id="powerup-star" onclick="useStar()" class="bg-yellow-100 border-2 border-yellow-500 hover:bg-yellow-200 px-3 py-1 rounded-lg text-xs font-bold flex items-center space-x-1">
+                        <span>⭐ 双倍币</span>
+                        <span id="count-star" class="bg-yellow-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">2</span>
+                    </button>
+                    <button id="powerup-flower" onclick="useFlower()" class="bg-orange-100 border-2 border-orange-500 hover:bg-orange-200 px-3 py-1 rounded-lg text-xs font-bold flex items-center space-x-1">
+                        <span>🔥 破错项</span>
+                        <span id="count-flower" class="bg-orange-500 text-white px-1.5 py-0.5 rounded-full text-[10px]">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <!-- Option buttons dynamically generated -->
+            </div>
+
+            <!-- Feedback Modal Banner -->
+            <div id="feedback-banner" class="hidden mario-card p-4 text-center rounded-xl animate-fade-in">
+                <div id="feedback-title" class="text-xl font-bold mb-1"></div>
+                <div id="feedback-text" class="text-gray-700 font-medium"></div>
+                <button onclick="nextQuestion()" class="mt-3 mario-btn-yellow px-6 py-2 text-base font-bold rounded-lg">
+                    下一题 ➔
+                </button>
+            </div>
+
+        </div>
+
+        <!-- RESULT / END SCREEN -->
+        <div id="result-screen" class="hidden mario-card p-6 text-center space-y-6 my-auto">
+            <div class="text-5xl">🏰🎉</div>
+            <h2 id="result-title" class="kuaile-font text-3xl sm:text-4xl text-yellow-600 drop-shadow-[0_2px_0_#000]">
+                关卡顺利通关！
+            </h2>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-lg mx-auto text-center font-bold">
+                <div class="bg-yellow-100 border-2 border-black p-2 rounded">
+                    <div class="text-xs text-gray-500">最终得分</div>
+                    <div id="final-score" class="text-xl text-red-600">0</div>
+                </div>
+                <div class="bg-yellow-100 border-2 border-black p-2 rounded">
+                    <div class="text-xs text-gray-500">获得金币</div>
+                    <div id="final-coins" class="text-xl text-yellow-600">0</div>
+                </div>
+                <div class="bg-yellow-100 border-2 border-black p-2 rounded">
+                    <div class="text-xs text-gray-500">答对题数</div>
+                    <div id="final-correct" class="text-xl text-green-600">0/50</div>
+                </div>
+                <div class="bg-yellow-100 border-2 border-black p-2 rounded">
+                    <div class="text-xs text-gray-500">正确率</div>
+                    <div id="final-accuracy" class="text-xl text-blue-600">0%</div>
+                </div>
+            </div>
+
+            <!-- Review Wrong Questions Section -->
+            <div id="wrong-summary-box" class="text-left bg-gray-50 border-2 border-black p-4 rounded-lg max-h-60 overflow-y-auto">
+                <h3 class="font-bold text-gray-800 border-b pb-2 mb-2">📝 错题复习本：</h3>
+                <div id="wrong-list" class="space-y-2 text-sm">
+                    <!-- Wrong items populated here -->
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4 pt-2">
+                <button onclick="startGame()" class="mario-btn-yellow px-6 py-3 font-bold text-lg rounded-xl">
+                    🔄 重新挑战
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Decorative Ground Footbar -->
+    <footer class="mario-ground h-12 w-full flex justify-center items-center text-xs text-white font-bold tracking-widest shadow-inner">
+        SJK (C) KUO KUANG 2 • 2026 一年级华文生字词语练习游戏
+    </footer>
+
+    <script>
+        /* Web Audio API Synthesizer for Retro Mario SFX */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'coin') {
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc1.type = 'sine';
+                osc2.type = 'sine';
+
+                osc1.frequency.setValueAtTime(987.77, now); // B5
+                osc1.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                osc1.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc1.start(now);
+                osc1.stop(now + 0.3);
+            } else if (type === 'correct') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+
+                osc.frequency.setValueAtTime(220, now); // A3
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.25); // A2
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'powerup') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+
+                [330, 392, 659, 523, 587, 784].forEach((freq, idx) => {
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+                });
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.35);
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('sound-toggle');
+            btn.innerText = soundEnabled ? "🔊 音效" : "🔇 静音";
+        }
+
+        let pinyinEnabled = false;
+        function togglePinyin() {
+            pinyinEnabled = !pinyinEnabled;
+            document.getElementById('pinyin-status').innerText = pinyinEnabled ? "开" : "关";
+            document.getElementById('pinyin-hint').classList.toggle('hidden', !pinyinEnabled);
+            document.getElementById('sentence-pinyin').classList.toggle('hidden', !pinyinEnabled);
+        }
+
+        const questionsData = [
+            // 单元一
+            { id: 1, unit: "第一单元", sentence: "早晨，我和小明手拉着手，（ ___ ）去学校上学。", answer: "一起", options: ["一起", "招手", "树枝", "朋友"], pinyin: "zǎo chén, wǒ hé xiǎo míng shǒu lā zhe shǒu, ( yī qǐ ) qù xué xiào shàng xué." },
+            { id: 2, unit: "第一单元", sentence: "太阳升起了，小草和花儿向我们（ ___ ）。", answer: "招手", options: ["招手", "花儿", "门口", "草地"], pinyin: "tài yáng shēng qǐ le, xiǎo cǎo hé huā ér xiàng wǒ men ( zhāo shǒu )." },
+            { id: 3, unit: "第一单元", sentence: "我们在树下的（ ___ ）上快乐地做游戏。", answer: "草地", options: ["草地", "树枝", "小鸟", "门口"], pinyin: "wǒ men zài shù xià de ( cǎo dì ) shàng kuài lè de zuò yóu xì." },
+            { id: 4, unit: "第一单元", sentence: "小花猫站在我家（ ___ ），喵喵地叫着。", answer: "门口", options: ["门口", "朋友", "上学", "做早操"], pinyin: "xiǎo huā māo zhàn zài wǒ jiā ( mén kǒu ), miāo miāo de jiào zhe." },
+            
+            // 单元二
+            { id: 5, unit: "第二单元", sentence: "老师在讲台上讲课，同学们都在（ ___ ）地听讲。", answer: "用心", options: ["用心", "写字", "儿歌", "笔画"], pinyin: "lǎo shī zài jiǎng tái shàng jiǎng kè, tóng xué men dōu zài ( yòng xīn ) de tīng jiǎng." },
+            { id: 6, unit: "第二单元", sentence: "只要勤奋努力，多看书多写字，你的成绩就（ ___ ）。", answer: "错不了", options: ["错不了", "学习", "知识", "故事"], pinyin: "zhǐ yào qín fèn nǔ lì, duō kàn shū duō xiě zì, nǐ de chéng jì jiù ( cuò bù liǎo )." },
+            { id: 7, unit: "第二单元", sentence: "我喜欢在图书馆里（ ___ ），吸收新知识。", answer: "读书", options: ["读书", "故事", "上课", "写字"], pinyin: "wǒ xǐ huān zài tú shū guǎn lǐ ( dú shū ), xī shōu xīn zhī shi." },
+            { id: 8, unit: "第二单元", sentence: "我们在华文课上学唱了一首动听的（ ___ ）。", answer: "儿歌", options: ["儿歌", "笔画", "用心", "错不了"], pinyin: "wǒ men zài huá wén kè shàng xué chàng le yī shǒu dòng tīng de ( ér gē )." },
+
+            // 单元三
+            { id: 9, unit: "第三单元", sentence: "晚饭过后，（ ___ ）人围坐在一起看电视。", answer: "全家", options: ["全家", "笑声", "中间", "亲近"], pinyin: "wǎn fàn guò hòu, ( quán jiā ) rén wéi zuò zài yī qǐ kàn diàn shì." },
+            { id: 10, unit: "第三单元", sentence: "屋子里充满了小朋友们的欢声（ ___ ）。", answer: "笑声", options: ["笑声", "哥哥", "姐姐", "爸爸"], pinyin: "wū zi lǐ chōng mǎn le xiǎo péng yǒu men de huān shēng ( xiào shēng )." },
+            { id: 11, unit: "第三单元", sentence: "夜空中闪烁着许许多多亮晶晶的（ ___ ）。", answer: "星星", options: ["星星", "妈妈", "笑声", "全家"], pinyin: "yè kōng zhōng shǎn shuò zhe xǔ xǔ duō duō liàng jīng jīng de ( xīng xīng )." },
+            { id: 12, unit: "第三单元", sentence: "（ ___ ）在厨房里为我们准备了丰盛的晚餐。", answer: "妈妈", options: ["妈妈", "星星", "中间", "亲近"], pinyin: "( mā ma ) zài chú fáng lǐ wèi wǒ men zhǔn bèi le fēng shèng de wǎn fān." },
+
+            // 单元四
+            { id: 13, unit: "第四单元", sentence: "放学后，小明最喜欢去公园的（ ___ ）玩耍。", answer: "游乐场", options: ["游乐场", "房子", "苦瓜", "积木"], pinyin: "fàng xué hòu, xiǎo míng zuì xǐ huān qù gōng yuán de ( yóu lè chǎng ) wán shuǎ." },
+            { id: 14, unit: "第四单元", sentence: "妈妈炒的（ ___ ）香喷喷的，真好吃！", answer: "饭菜", options: ["饭菜", "苦瓜", "房子", "积木"], pinyin: "mā ma chǎo de ( fàn cài ) xiāng pēn pēn de, zhēn hǎo chī!" },
+            { id: 15, unit: "第四单元", sentence: "我用一块块彩色的（ ___ ），搭出了一座高楼。", answer: "积木", options: ["积木", "吃鱼", "妹妹", "学校"], pinyin: "wǒ yòng yī kuài kuài cǎi sè de ( jī mù ), dā chū le yī zuò gāo lóu." },
+
+            // 单元五
+            { id: 16, unit: "第五单元", sentence: "太阳落山了，弯弯的（ ___ ）挂在夜空中。", answer: "月亮", options: ["月亮", "露珠", "青色", "弯曲"], pinyin: "tài yáng luò shān le, wān wān de ( yuè liang ) guà zài yè kōng zhōng." },
+            { id: 17, unit: "第五单元", sentence: "清晨，草叶上有一颗颗晶莹透亮的（ ___ ）。", answer: "露珠", options: ["露珠", "照相", "不见", "小河"], pinyin: "qīng chén, cǎo yè shàng yǒu yī kē kē jīng yíng tòu liàng de ( lù zhū )." },
+            { id: 18, unit: "第五单元", sentence: "（ ___ ），彩虹出来了，太阳露出了笑脸。", answer: "雨停了", options: ["雨停了", "肥胖", "弯曲", "青色"], pinyin: "( yǔ tíng le ), cǎi hóng chū lái le, tài yáng lù chū le xiào liǎn." },
+
+            // 单元六
+            { id: 19, unit: "第六单元", sentence: "地上的（ ___ ）成群结队地搬运食物。", answer: "蚂蚁", options: ["蚂蚁", "老虎", "轻重", "洞穴"], pinyin: "dì shàng de ( mǎ yǐ ) chéng qún jié duì de bān yùn shí wù." },
+            { id: 20, unit: "第六单元", sentence: "小朋友们要（ ___ ）交通规则，安全第一。", answer: "记牢", options: ["记牢", "多少", "一边", "洞穴"], pinyin: "xiǎo péng yǒu men yào ( jì láo ) jiāo tōng guī zé, ān quán dì yī." },
+            { id: 21, unit: "第六单元", sentence: "森林里的（ ___ ）是百兽之王，非常威风。", answer: "老虎", options: ["老虎", "小虫", "蚂蚁", "一群鹅"], pinyin: "sēn lín lǐ de ( lǎo hǔ ) shì bǎi shòu zhī wáng, fēi cháng wēi fēng." },
+
+            // 单元七
+            { id: 22, unit: "第七单元", sentence: "蜜蜂在花丛中飞来飞去，忙着（ ___ ）。", answer: "采花蜜", options: ["采花蜜", "飞翔", "牙齿", "脚爪"], pinyin: "mì fēng zài huā cóng zhōng fēi lái fēi qù, máng zhe ( cǎi huā mì )." },
+            { id: 23, unit: "第七单元", sentence: "公园里的花朵盛开了，到处散发着阵阵（ ___ ）。", answer: "香味", options: ["香味", "花园", "采花蜜", "我们"], pinyin: "gōng yuán lǐ de huā duǒ shèng kāi le, dào chù sàn fā zhe zhèn zhèn ( xiāng wèi )." },
+            { id: 24, unit: "第七单元", sentence: "小狗用前（ ___ ）在地里刨了一个小坑。", answer: "脚爪", options: ["脚爪", "牙齿", "飞翔", "花园"], pinyin: "xiǎo gǒu yòng qián ( jiǎo zhuǎ ) zài dì lǐ páo le yī gè xiǎo kēng." },
+
+            // 单元八
+            { id: 25, unit: "第八单元", sentence: "小猴子最喜欢吃甜甜的（ ___ ）。", answer: "香蕉", options: ["香蕉", "黄色", "快乐", "风儿"], pinyin: "xiǎo hóu zi zuì xǐ huān chī tián tián de ( xiāng jiāo )." },
+            { id: 26, unit: "第八单元", sentence: "假期里，爸爸妈妈带我们去郊外（ ___ ）。", answer: "爬山", options: ["爬山", "唱歌", "坐飞机", "玩滑梯"], pinyin: "jià qī lǐ, bà ba mā ma dài wǒ men qù jiāo wài ( pá shān )." },
+            { id: 27, unit: "第八单元", sentence: "在同伴的帮助下，我们克服了（ ___ ）困难。", answer: "很多", options: ["很多", "快乐", "风儿", "一棵树"], pinyin: "zài tóng bàn de bāng zhù xià, wǒ men kè fú le ( hěn duō ) kùn nán." },
+
+            // 单元九
+            { id: 28, unit: "第九单元", sentence: "夜幕降临，漆黑的（ ___ ）笼罩着大地。", answer: "黑夜", options: ["黑夜", "蓝天", "悄悄", "睡衣"], pinyin: "yè mù jiàng lín, qī hēi de ( hēi yè ) lǒng zhào zhe dà dì." },
+            { id: 29, unit: "第九单元", sentence: "妹妹穿上了漂亮的（ ___ ），准备上床睡觉。", answer: "睡衣", options: ["睡衣", "铅笔", "图画", "发现"], pinyin: "mèi mei chuān shàng le piào liang de ( shuì yī ), zhǔn bèi shàng chuáng shuì jiào." },
+            { id: 30, unit: "第九单元", sentence: "经过仔细观察，小明（ ___ ）了昆虫筑巢的秘密。", answer: "发现", options: ["发现", "明白", "悄悄", "最好"], pinyin: "jīng guò zǐ xì guān chá, xiǎo míng ( fā xiàn ) le kūn chóng zhù cháo de mì mì." },
+
+            // 单元十
+            { id: 31, unit: "第十单元", sentence: "美术课上，同学们拿出（ ___ ）和彩笔开始画画。", answer: "画纸", options: ["画纸", "剪刀", "工具", "落叶"], pinyin: "měi shù kè shàng, tóng xué men ná chū ( huà zhǐ ) hé cǎi bǐ kāi shǐ huà huà." },
+            { id: 32, unit: "第十单元", sentence: "做手工剪纸需要用到一把（ ___ ）。", answer: "剪刀", options: ["剪刀", "身后", "简单", "带走"], pinyin: "zuò shǒu gōng jiǎn zhǐ xū yào yòng dào yī bǎ ( jiǎn dāo )." },
+            { id: 33, unit: "第十单元", sentence: "阳光洒在（ ___ ）上，金灿灿的真美丽。", answer: "金沙滩", options: ["金沙滩", "小船", "落叶", "拿起"], pinyin: "yáng guāng sǎ zài ( jīn shā tān ) shàng, jīn càn càn de zhēn měi lì." },
+
+            // 单元十一
+            { id: 34, unit: "第十一单元", sentence: "早上到了学校，大家向（ ___ ）道一声早上好。", answer: "老师", options: ["老师", "同学", "汽车", "相助"], pinyin: "zǎo shang dào le xué xiào, dà jiā xiàng ( lǎo shī ) dào yī shēng zǎo shang hǎo." },
+            { id: 35, unit: "第十一单元", sentence: "同学之间要互相关心、守望（ ___ ）。", answer: "相助", options: ["相助", "点头", "见面", "存钱"], pinyin: "tóng xué zhī jiān yào hù xiāng guān xīn 、shǒu wàng ( xiāng zhù )." },
+            { id: 36, unit: "第十一单元", sentence: "我每天把节省下来的零用钱拿去（ ___ ）。", answer: "存钱", options: ["存钱", "汽车", "谢谢", "半年"], pinyin: "wǒ měi tiān bǎ jié shěng xià lái de líng yòng qián ná qù ( cún qián )." },
+
+            // 单元十二
+            { id: 37, unit: "第十二单元", sentence: "看到同学跌倒了，我们应该主动走过去（ ___ ）。", answer: "帮忙", options: ["帮忙", "翅膀", "捕捉", "不见"], pinyin: "kàn dào tóng xué diē dǎo le, wǒ men yīng gāi zhǔ dòng zǒu guò qù ( bāng máng )." },
+            { id: 38, unit: "第十二单元", sentence: "在这次运动会上，小强夺得了跑步比赛（ ___ ）。", answer: "第一名", options: ["第一名", "运动会", "孩子", "得到"], pinyin: "zài zhè cì yùn dòng huì shàng, xiǎo qiáng duó dé le pǎo bù bǐ sài ( dì yī míng )." },
+            { id: 39, unit: "第十二单元", sentence: "小鸟展开双（ ___ ），飞向蓝蓝的天空。", answer: "翅膀", options: ["翅膀", "海马", "捕捉", "得到"], pinyin: "xiǎo niǎo zhǎn kāi shuāng ( chì bǎng ), fēi xiàng lán lán de tiān kōng." },
+
+            // 单元十三
+            { id: 40, unit: "第十三单元", sentence: "饭前洗手、饭后漱口，才能保持身体（ ___ ）。", answer: "干净", options: ["干净", "晚上", "娃娃", "遮着"], pinyin: "fàn qián xǐ shǒu 、fàn hòu shù kǒu, cái néng bǎo chí shēn tǐ ( gān jìng )." },
+            { id: 41, unit: "第十三单元", sentence: "外面下起了大雨，妈妈递给我一把（ ___ ）。", answer: "雨伞", options: ["雨伞", "手影", "灯光", "墙上"], pinyin: "wài miàn xià qǐ le dà yǔ, mā ma dì gěi wǒ yī bǎ ( yǔ sǎn )." },
+
+            // 单元十四
+            { id: 42, unit: "第十四单元", sentence: "这盘刚刚炒好的菜（ ___ ）的，让人流口水。", answer: "香喷喷", options: ["香喷喷", "跳进", "成为", "应该"], pinyin: "zhè pán gāng gāng chǎo hǎo de cài ( xiāng pēn pēn ) de, ràng rén liú kǒu shuǐ." },
+            { id: 43, unit: "第十四单元", sentence: "我们（ ___ ）养成良好的读书习惯。", answer: "应该", options: ["应该", "穿鞋子", "报纸", "玩耍"], pinyin: "wǒ men ( yīng gāi ) yǎng chéng liáng hǎo de dú shū xí guàn." },
+
+            // 单元十五
+            { id: 44, unit: "第十五单元", sentence: "华丽的小花在风中微微（ ___ ），好看极了。", answer: "摇摆", options: ["摇摆", "生气", "圆脸", "回答"], pinyin: "huá lì de xiǎo huā zài fēng zhōng wēi wēi ( yáo bǎi ), hǎo kàn jí le." },
+            { id: 45, unit: "第十五单元", sentence: "孔雀展开了五彩缤纷的羽毛，真是（ ___ ）极了！", answer: "美丽", options: ["美丽", "生病", "变成", "高空"], pinyin: "kǒng què zhǎn kāi le wǔ cǎi bīn fēn de yǔ máo, zhēn shì ( měi lì ) jí le!" },
+
+            // 单元十六
+            { id: 46, unit: "第十六单元", sentence: "突然（ ___ ）了，屋子里一片漆黑，妈妈点燃了蜡烛。", answer: "停电", options: ["停电", "窗外", "洗澡", "知道"], pinyin: "tū rán ( tíng diàn ) le, wū zi lǐ yī piàn qī hēi, mā ma diǎn rán le là zhú." },
+            { id: 47, unit: "第十六单元", sentence: "听到流浪猫的（ ___ ），大家连忙跑过去救它。", answer: "喊叫", options: ["喊叫", "责怪", "升起", "踢球"], pinyin: "tīng dào liú làng māo de ( hǎn jiào ), dà jiā lián máng pǎo guò qù jiù tā." },
+
+            // 单元十七
+            { id: 48, unit: "第十七单元", sentence: "飞了一整天，小鸟飞回树林里（ ___ ）了。", answer: "休息", options: ["休息", "追赶", "欢呼", "顺着"], pinyin: "fēi le yī zhěng tiān, xiǎo niǎo fēi huí shù lín lǐ ( xiū xi ) le." },
+
+            // 单元十八
+            { id: 49, unit: "第十八单元", sentence: "树木能美化环境，我们要好好（ ___ ）一草一木。", answer: "爱护", options: ["爱护", "农田", "土地", "稻米"], pinyin: "shù mù néng měi huà huán jìng, wǒ men yào hǎo hǎo ( ài hù ) yī cǎo yī mù." },
+
+            // 单元二十二
+            { id: 50, unit: "第二十二单元", sentence: "大扫除时，同学们分工合作，把教室（ ___ ）得干干净净。", answer: "打扫", options: ["打扫", "吵醒", "擦伤", "破坏"], pinyin: "dà sǎo chú shí, tóng xué men fēn gōng hé zuò, bǎ jiào shì ( dǎ sǎo ) de gān gān jìng jìng." }
+        ];
+
+        let currentIdx = 0;
+        let score = 0;
+        let coins = 0;
+        let lives = 3;
+        let correctCount = 0;
+        let starActive = false; // Double coins powerup
+        let userAnswers = []; // Store answers for review
+
+        let powerups = {
+            mushroom: 3,
+            star: 2,
+            flower: 2
+        };
+
+        function startGame() {
+            initAudio();
+            currentIdx = 0;
+            score = 0;
+            coins = 0;
+            lives = 3;
+            correctCount = 0;
+            userAnswers = [];
+            powerups = { mushroom: 3, star: 2, flower: 2 };
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-screen').classList.add('flex');
+
+            updateHUD();
+            renderQuestion();
+        }
+
+        function updateHUD() {
+            document.getElementById('score-display').innerText = String(score).padStart(6, '0');
+            document.getElementById('coins-display').innerText = `🪙 x${coins}`;
+            
+            // World calculation: Q1-10 -> 1-1..1-10, Q11-20 -> 2-1..2-10
+            const worldNum = Math.floor(currentIdx / 10) + 1;
+            const subNum = (currentIdx % 10) + 1;
+            document.getElementById('world-display').innerText = `${worldNum}-${subNum}`;
+
+            // Lives
+            let hearts = '';
+            for (let i = 0; i < lives; i++) hearts += '❤️ ';
+            document.getElementById('lives-display').innerText = hearts || '💀';
+
+            // Powerups count
+            document.getElementById('count-mushroom').innerText = powerups.mushroom;
+            document.getElementById('count-star').innerText = powerups.star;
+            document.getElementById('count-flower').innerText = powerups.flower;
+
+            // Progress bar
+            const pct = (currentIdx / questionsData.length) * 100;
+            document.getElementById('progress-fill').style.width = `${pct}%`;
+            document.getElementById('mario-avatar').style.left = `${Math.min(pct, 92)}%`;
+            document.getElementById('progress-text').innerText = `Q ${currentIdx + 1} / ${questionsData.length}`;
+        }
+
+        function renderQuestion() {
+            const q = questionsData[currentIdx];
+            document.getElementById('unit-badge').innerText = `【${q.unit}】`;
+            document.getElementById('sentence-display').innerText = q.sentence;
+            document.getElementById('sentence-pinyin').innerText = q.pinyin;
+
+            // Hide feedback
+            document.getElementById('feedback-banner').classList.add('hidden');
+
+            // Render Options
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = '';
+
+            // Shuffle options copy
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = 'mario-brick p-4 text-xl sm:text-2xl font-bold rounded-xl hover:scale-105 transition-transform flex justify-center items-center';
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt, btn);
+                optionsGrid.appendChild(btn);
+            });
+
+            updateHUD();
+        }
+
+        function handleAnswer(selectedOpt, btnElement) {
+            const q = questionsData[currentIdx];
+            const optionsGrid = document.getElementById('options-grid');
+            const allBtns = optionsGrid.querySelectorAll('button');
+
+            // Disable buttons
+            allBtns.forEach(b => b.disabled = true);
+
+            const isCorrect = (selectedOpt === q.answer);
+
+            userAnswers.push({
+                question: q,
+                userChoice: selectedOpt,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                btnElement.classList.remove('mario-brick');
+                btnElement.classList.add('mario-btn-yellow', 'text-black');
+                
+                playSound('correct');
+                playSound('coin');
+
+                // Calc score & coins
+                const coinGain = starActive ? 20 : 10;
+                coins += coinGain;
+                score += (starActive ? 200 : 100);
+                correctCount++;
+
+                // Visual Coin Animation
+                createFloatingCoin(btnElement, `+${coinGain} 🪙`);
+
+                showFeedback(true, `答对啦！得 +${coinGain} 金币！`, `正确词语是：“${q.answer}”`);
+                
+                // Reset star if active
+                if (starActive) starActive = false;
+
+            } else {
+                btnElement.classList.remove('mario-brick');
+                btnElement.classList.add('bg-red-600', 'text-white', 'border-4', 'border-black');
+
+                playSound('wrong');
+
+                // Shake screen
+                document.getElementById('question-card').classList.add('animate-shake');
+                setTimeout(() => {
+                    document.getElementById('question-card').classList.remove('animate-shake');
+                }, 400);
+
+                lives--;
+
+                showFeedback(false, `真遗憾，选错啦！`, `正确答案应该是：“${q.answer}”`);
+
+                if (lives <= 0) {
+                    setTimeout(endGame, 1500);
+                    return;
+                }
+            }
+
+            updateHUD();
+        }
+
+        function createFloatingCoin(targetEl, text) {
+            const rect = targetEl.getBoundingClientRect();
+            const coin = document.createElement('div');
+            coin.className = 'floating-coin';
+            coin.innerText = text;
+            coin.style.left = `${rect.left + rect.width / 2 - 20}px`;
+            coin.style.top = `${rect.top - 20}px`;
+            document.body.appendChild(coin);
+
+            setTimeout(() => coin.remove(), 800);
+        }
+
+        function showFeedback(isCorrect, title, text) {
+            const banner = document.getElementById('feedback-banner');
+            const titleEl = document.getElementById('feedback-title');
+            const textEl = document.getElementById('feedback-text');
+
+            banner.classList.remove('hidden', 'bg-green-100', 'bg-red-100');
+            if (isCorrect) {
+                banner.classList.add('bg-green-100');
+                titleEl.className = 'text-xl font-bold text-green-700';
+            } else {
+                banner.classList.add('bg-red-100');
+                titleEl.className = 'text-xl font-bold text-red-700';
+            }
+
+            titleEl.innerText = title;
+            textEl.innerText = text;
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx >= questionsData.length) {
+                endGame();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        /* Powerups Logic */
+        function useMushroom() {
+            if (powerups.mushroom <= 0) return;
+            const q = questionsData[currentIdx];
+            const allBtns = Array.from(document.getElementById('options-grid').children);
+            
+            // Remove 2 incorrect buttons
+            let removed = 0;
+            allBtns.forEach(btn => {
+                if (btn.innerText !== q.answer && removed < 2 && !btn.disabled) {
+                    btn.style.opacity = '0.2';
+                    btn.disabled = true;
+                    removed++;
+                }
+            });
+
+            if (removed > 0) {
+                powerups.mushroom--;
+                playSound('powerup');
+                updateHUD();
+            }
+        }
+
+        function useStar() {
+            if (powerups.star <= 0 || starActive) return;
+            starActive = true;
+            powerups.star--;
+            playSound('powerup');
+            updateHUD();
+            alert("⭐ 无敌星已激活！本题获得双倍金币！");
+        }
+
+        function useFlower() {
+            if (powerups.flower <= 0) return;
+            const q = questionsData[currentIdx];
+            const allBtns = Array.from(document.getElementById('options-grid').children);
+
+            let removed = false;
+            allBtns.forEach(btn => {
+                if (btn.innerText !== q.answer && !removed && btn.style.opacity !== '0.2') {
+                    btn.style.opacity = '0.2';
+                    btn.disabled = true;
+                    removed = true;
+                }
+            });
+
+            if (removed) {
+                powerups.flower--;
+                playSound('powerup');
+                updateHUD();
+            }
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const total = questionsData.length;
+            const accuracy = Math.round((correctCount / total) * 100);
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-coins').innerText = `🪙 ${coins}`;
+            document.getElementById('final-correct').innerText = `${correctCount} / ${total}`;
+            document.getElementById('final-accuracy').innerText = `${accuracy}%`;
+
+            const wrongListEl = document.getElementById('wrong-list');
+            wrongListEl.innerHTML = '';
+
+            const wrongAnswers = userAnswers.filter(a => !a.isCorrect);
+
+            if (wrongAnswers.length === 0) {
+                wrongListEl.innerHTML = `<div class="text-green-600 font-bold text-center py-2">🌟 太棒了！你答对了所有题目，是华文生字小达人！</div>`;
+            } else {
+                wrongAnswers.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'p-2 bg-white border rounded shadow-sm';
+                    div.innerHTML = `
+                        <div class="font-bold text-red-600">${index + 1}. 【${item.question.unit}】 ${item.question.sentence.replace('（ ___ ）', `<u>（ ${item.question.answer} ）</u>`)}</div>
+                        <div class="text-xs text-gray-600 mt-1">
+                            你的选择: <span class="text-red-500 line-through">${item.userChoice}</span> | 
+                            正确词语: <span class="text-green-600 font-bold">${item.question.answer}</span>
+                        </div>
+                    `;
+                    wrongListEl.appendChild(div);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
